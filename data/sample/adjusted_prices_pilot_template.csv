@@ -1,0 +1,3 @@
+ticker,date,adjusted_close,adjustment_method,currency
+SPY,2025-01-02,584.64,split_and_dividend_adjusted,USD
+AAPL,2025-01-02,243.85,split_and_dividend_adjusted,USD
