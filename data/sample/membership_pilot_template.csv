@@ -1,0 +1,2 @@
+ticker,start_date,end_date,index_name,source_reference
+AAPL,2024-01-01,2025-12-31,S&P 100,REPLACE_WITH_AUTHORITATIVE_SOURCE
