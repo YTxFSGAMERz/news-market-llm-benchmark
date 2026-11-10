@@ -50,6 +50,10 @@ The starter currently validates input data and provides baseline metric/event-st
 
 See [data dictionary](docs/data_dictionary.md). The sample CSV is synthetic. Keep licensed/raw datasets out of Git unless redistribution is explicitly permitted. Put local raw files in `data/raw/` (ignored by Git).
 
+## Data-source audit
+
+Candidate news, market-price, and index-membership sources have been compared, including access and licensing constraints. No provider is approved yet; see [data-source audit](docs/data_sources.md) before acquiring data.
+
 ## Initial protocol
 
 The proposed first study is US equities (S&P 100, point-in-time membership) from 2018-01-01 to 2025-12-31, with a separate NIFTY 50 India extension later. The primary target is next-session stock excess-return direction versus SPY. This design remains provisional until news coverage, market-data quality, historical constituent membership, and licensing are audited. See [protocol v0.1](docs/preregistration.md).
