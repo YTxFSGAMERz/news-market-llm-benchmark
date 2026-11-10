@@ -37,9 +37,8 @@ def audit_news(path):
                "unique_normalized_headlines": group.loc[~dup, "normalized"].nunique(),
                "duplicate_rows": int(dup.sum()), "missing_headline_rows": int(group.missing_headline.sum()),
                "valid_timestamp_rows": int((~group.bad_timestamp).sum()),
-               "timestamp_completeness": round(float((~group.bad_timestamp).mean()), 4),
                "timestamps_with_clock_time": int(group.has_time.sum()),
-               "clock_time_precision_rate": round(float(group.has_time.mean()), 4)}
+               "clock_time_precision_rate_among_timestamped_rows": round(float(group.has_time.mean()), 4)}
         for col in ("publisher", "url", "first_seen_at"):
             if col in group:
                 row[f"{col}_present_rows"] = int(group[col].str.strip().ne("").sum())
