@@ -44,7 +44,11 @@ python -m pip install -e ".[dev]"
 pytest
 ```
 
-The starter currently validates input data and provides baseline metric/event-study utilities. It does not download market data or call paid LLM APIs.
+The starter validates input data and provides baseline metric/event-study utilities. It does not download market data or call paid LLM APIs.
+
+## Coverage pilot
+
+Use the provider-agnostic local CSV auditor before selecting a vendor. See [coverage audit instructions](docs/coverage_audit.md) and the [data-source audit](docs/data_sources.md). The auditor writes per-ticker/year news and price coverage, membership checks, a source-manifest copy, JSON summary, and Markdown report. It makes no network calls and does not approve providers.
 
 ## Input data
 
