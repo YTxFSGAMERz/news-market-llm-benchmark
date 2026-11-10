@@ -1,34 +1,56 @@
-# Methodology (draft)
+# Methodology (protocol draft v0.1)
 
-## Unit of analysis
+## Scope and unit of analysis
 
-One timestamped financial-news headline associated with one publicly traded ticker. Deduplication and entity mapping rules must be fixed before model evaluation.
+The first experiment studies US-listed equities from 2018-01-01 through 2025-12-31. The proposed universe is the S&P 100, using point-in-time membership. A current constituent list must not be backfilled across the full period because doing so creates survivorship bias. If reliable historical membership cannot be obtained, the study must be relabeled as a fixed-universe exploratory analysis and its limitation disclosed.
 
-## Outcome
+The India extension will use NIFTY 50 constituents and will be run as a separate market study after the US pipeline is stable. Do not combine the markets in the primary result.
 
-The initial proposed outcome is the sign of the ticker's next tradable-session close-to-close return relative to a predeclared benchmark. The final definition must account for after-hours publication, exchange holidays, time zones and market opening times. Do not assign a same-day return to a headline published after the relevant price move.
+One observation is a timestamped headline confidently mapped to one issuer/ticker. Retain source, canonical URL, original timestamp, timezone, normalized UTC timestamp, retrieval timestamp, and duplicate-group ID.
+
+## Primary target
+
+For each eligible headline, calculate the stock's return from the last regular-session close before publication to the close of the next eligible regular session. Subtract the corresponding SPY benchmark return:
+
+    excess_return = stock_return - SPY_return
+
+The binary target is 1 for strictly positive excess return and 0 otherwise. A headline after the regular close, on a weekend, or on an exchange holiday maps to the next eligible session. A pre-market headline maps to that session only when its verified timestamp precedes the regular open. Ambiguous/date-only timestamps are excluded from the primary analysis and counted in the exclusion report.
+
+This is a predictive association, not evidence that a headline caused a return.
+
+## Data quality and entity resolution
+
+Use a documented ticker/issuer alias dictionary. Manually review ambiguous mappings without consulting future outcomes. Deduplicate exact and near-duplicate/syndicated headlines and keep related duplicates in one split. Preserve an exclusion reason for every discarded record. Never infer publication time from retrieval time.
 
 ## Models
 
-1. Market-only baseline: lagged returns and volume-derived features.
-2. Transparent lexical baseline.
-3. FinBERT or another documented finance-domain classifier.
-4. LLM classifiers with fixed prompts and recorded model versions.
+- Market-only baseline: lagged returns and volume features available before publication.
+- Lexicon baseline: transparent repository implementation.
+- FinBERT: fixed checkpoint/tokenizer revision, recorded in run metadata.
+- LLMs: fixed model identifier, prompt version, parameters, response schema, and request date.
 
-All models receive the same eligible headline text. Any model-specific preprocessing must be documented.
+All text classifiers receive identical headline text. Keep three-class sentiment (positive/neutral/negative) and document the conversion to a numeric score. No prompt or threshold tuning on the final test set.
 
-## Splits and leakage
+## Time splits
 
-Use chronological splits by publication time. Fit all learned preprocessing on training data only. Keep the final test period untouched until model and prompt choices are frozen. Group duplicate or syndicated headlines to prevent near-identical text crossing splits.
+- Train: 2018-01-01 to 2022-12-31
+- Validation: 2023-01-01 to 2024-12-31
+- Test: 2025-01-01 to 2025-12-31
 
-## Event study
+Use chronological splits only. Fit learned preprocessing on training data. Freeze prompts and model versions before evaluating the test period. Keep duplicate groups inside one split.
 
-Estimate expected returns with a market model over a pre-event estimation window. Compute abnormal returns as observed minus expected returns. Aggregate abnormal returns over predeclared event windows. The estimation window must not overlap the event window.
+## Metrics and inference
 
-## Statistical analysis
+Primary metric: ROC-AUC for positive next-session excess return. Report sample count and class balance. Secondary metrics include accuracy, balanced accuracy, precision, recall, F1, Brier score, and calibration where probabilities are available. Compare models on identical observations and report confidence intervals.
 
-Report confidence intervals and effect sizes, not only p-values. Account for repeated observations by ticker and date where feasible. Predefine primary comparisons and correct for multiple testing when conducting families of secondary tests.
+Event studies are secondary. Estimate expected returns with a market model over a pre-event estimation window that does not overlap the event window. Freeze exact windows before examining test outcomes. Report abnormal and cumulative abnormal returns with uncertainty intervals. Account for repeated ticker/date observations using an explicitly documented clustered or block-bootstrap method, and correct secondary hypothesis families for multiple comparisons.
+
+## Data-source selection
+
+Candidate news sources include GDELT 2.0, issuer press-release archives, and licensed financial-news datasets. Candidate market data must provide documented adjusted OHLCV history and clear terms; use one provider for equities and SPY where possible. Historical S&P 100 membership requires a dated, verifiable source. These are candidates, not approved sources.
+
+Before freezing the protocol, audit coverage, timestamp precision/timezone, corporate-action treatment, historical constituent coverage, API limits, costs, licenses, and redistribution restrictions. Keep restricted raw data out of Git. Do not treat a free endpoint as permission to redistribute its data.
 
 ## Limitations
 
-Headline sentiment is not the same as market surprise. Price reactions depend on expectations, macroeconomic conditions, liquidity, sector effects and information already priced in. Results may not generalize across markets or periods.
+Headline sentiment is not market surprise. Returns may reflect expectations, concurrent news, macroeconomic conditions, liquidity, and information already priced in. Survivorship bias, timestamp errors, corporate actions, and data-mining can distort findings. Report null and negative results.
