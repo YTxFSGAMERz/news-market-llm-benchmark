@@ -1,0 +1,4 @@
+headline_id,ticker,headline,published_at,source
+SYN-001,DEMO,Demo company reports strong profit growth,2026-01-05T08:00:00Z,synthetic
+SYN-002,DEMO,Demo company warns of weak demand and loss,2026-01-06T08:00:00Z,synthetic
+SYN-003,DEMO,Demo company announces annual shareholder meeting,2026-01-07T08:00:00Z,synthetic
